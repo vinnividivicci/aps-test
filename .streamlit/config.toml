@@ -13,4 +13,4 @@ enableCORS = false
 # on and `server.enableCORS` is off at the same time, we will prioritize
 # `server.enableXsrfProtection`.
 # Default: true
-enableXsrfProtection = true
+enableXsrfProtection = false
