@@ -3,4 +3,4 @@ numpy
 pandas
 pydeck
 streamlit
-streamlit-oauth
+streamlit-oauth==0.0.4
