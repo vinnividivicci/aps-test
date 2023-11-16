@@ -1,3 +1,4 @@
+[server]
 # Enables support for Cross-Origin Resource Sharing (CORS) protection, for
 # added security.
 # Due to conflicts between CORS and XSRF, if `server.enableXsrfProtection` is
