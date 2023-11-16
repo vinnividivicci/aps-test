@@ -13,6 +13,8 @@
 # limitations under the License.
 
 import streamlit as st
+from streamlit_oauth import OAuth2Component
+
 from streamlit.logger import get_logger
 
 LOGGER = get_logger(__name__)
@@ -24,28 +26,38 @@ def run():
         page_icon="👋",
     )
 
-    st.write("# Welcome to Streamlit! 👋")
+    st.title('Adsk Auth test')
 
-    st.sidebar.success("Select a demo above.")
+    # Set environment variables
+    AUTHORIZE_URL = st.secrets["AUTHORIZE_URL"]
+    TOKEN_URL = st.secrets["TOKEN_URL"]
+    REFRESH_TOKEN_URL = st.secrets["REFRESH_TOKEN_URL"]
+    REVOKE_TOKEN_URL = st.secrets["REVOKE_TOKEN_URL"]
+    CLIENT_ID = st.secrets["CLIENT_ID"]
+    CLIENT_SECRET = st.secrets["CLIENT_SECRET"]
+    REDIRECT_URI = st.secrets["REDIRECT_URI"]
+    SCOPE = st.secrets["SCOPE"]
 
-    st.markdown(
-        """
-        Streamlit is an open-source app framework built specifically for
-        Machine Learning and Data Science projects.
-        **👈 Select a demo from the sidebar** to see some examples
-        of what Streamlit can do!
-        ### Want to learn more?
-        - Check out [streamlit.io](https://streamlit.io)
-        - Jump into our [documentation](https://docs.streamlit.io)
-        - Ask a question in our [community
-          forums](https://discuss.streamlit.io)
-        ### See more complex demos
-        - Use a neural net to [analyze the Udacity Self-driving Car Image
-          Dataset](https://github.com/streamlit/demo-self-driving)
-        - Explore a [New York City rideshare dataset](https://github.com/streamlit/demo-uber-nyc-pickups)
-    """
-    )
+    # Create OAuth2Component instance
+    oauth2 = OAuth2Component(CLIENT_ID, CLIENT_SECRET, AUTHORIZE_URL, TOKEN_URL, REFRESH_TOKEN_URL, REVOKE_TOKEN_URL)
 
+    # Check if token exists in session state
+    if 'token' not in st.session_state:
+        # If not, show authorize button
+        result = oauth2.authorize_button("Authorize", REDIRECT_URI, SCOPE)
+        if result and 'token' in result:
+            # If authorization successful, save token in session state
+            st.session_state.token = result.get('token')
+            st.experimental_rerun()
+    else:
+        # If token exists in session state, show the token
+        token = st.session_state['token']
+        st.json(token)
+        if st.button("Refresh Token"):
+            # If refresh token button is clicked, refresh the token
+            token = oauth2.refresh_token(token)
+            st.session_state.token = token
+            st.experimental_rerun()
 
 if __name__ == "__main__":
     run()
